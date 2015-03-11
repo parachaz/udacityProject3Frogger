@@ -1,5 +1,7 @@
 var generateRandomNumber =  function (p1, p2){
-    return Math.floor(Math.random() * (p1) + p2)
+    var randomNum =  Math.floor(Math.random() * (p1) + p2);
+    //console.log("Random randomNum =" + randomNum);
+    return randomNum;
 };
 // Enemies our player must avoid
 var Enemy = function (id, x, y) {
@@ -11,10 +13,10 @@ var Enemy = function (id, x, y) {
     /*x = Math.floor(Math.random() * (20) + 5);
     y = Math.floor(Math.random() * (80) + 5);*/
     x = generateRandomNumber (20, 5);
-    y = generateRandomNumber (80, 5);
+    y = generateRandomNumber (id*90, 30);
     this.id = id;
-    this.x = x * id;
-   /* this.y = y * id;*/
+    this.x = x ;//* id;
+    this.y = y;//y * id;
     this.sprite = 'images/enemy-bug.png';
 };
 
@@ -25,11 +27,9 @@ Enemy.prototype.update = function (dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 
-    if (this.y === 0) {
-        this.resetPosition();
-    }
-    this.x = this.x * dt * 65;
-    if (this.x > 550 || this.x<1) {
+    var movement = generateRandomNumber(100, 10);
+    this.x +=  dt * movement;
+    if (this.y===0 || this.x > 550 || this.x<1) {
         this.resetPosition();
     }
     if (Math.abs(this.x - player.x) < 16 && Math.abs(this.y - player.y) < 16) {
