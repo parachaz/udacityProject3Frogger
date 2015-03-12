@@ -1,22 +1,26 @@
-var generateRandomNumber =  function (p1, p2){
-    var randomNum =  Math.floor(Math.random() * (p1) + p2);
-    //console.log("Random randomNum =" + randomNum);
-    return randomNum;
-};
-// Enemies our player must avoid
-var Enemy = function (id, x, y) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+/*
+ * Returnss a random number between p1 and p2
+ * @param {type} p1
+ * @param {type} p2
+ * @returns {Number}
+ */
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    /*x = Math.floor(Math.random() * (20) + 5);
-    y = Math.floor(Math.random() * (80) + 5);*/
-    x = generateRandomNumber (20, 5);
-    y = generateRandomNumber (id*90, 30);
+var generateRandomNumber = function (p1, p2) {
+    return Math.floor(Math.random() * (p1 - p2) + p2);
+
+};
+
+// Enemies our player must avoid
+var Enemy = function (id) {
+    //Give each enemey a radom starting x-axis position 
+    this.x = generateRandomNumber(50, 5);
     this.id = id;
-    this.x = x ;//* id;
-    this.y = y;//y * id;
+
+    //We will use 75 as a multipler to give y-axis spacing among the enemies
+    var spacing = id * 75;
+
+    //Assign a radom y-axis value to the enemy
+    this.y = generateRandomNumber(spacing, spacing - 20);
     this.sprite = 'images/enemy-bug.png';
 };
 
@@ -28,24 +32,31 @@ Enemy.prototype.update = function (dt) {
     // all computers.
 
     var movement = generateRandomNumber(100, 10);
-    this.x +=  dt * movement;
-    if (this.y===0 || this.x > 550 || this.x<1) {
+    this.x += dt * movement;
+    //Reset enemy's positon if goes too far on the right.
+    
+    if ( this.x > 550 ) {
         this.resetPosition();
     }
+    /* Check for collision. if the enemy hit the player
+     * deduct a life and reset player's position
+     */
+    
     if (Math.abs(this.x - player.x) < 16 && Math.abs(this.y - player.y) < 16) {
         player.x = 215;
         player.y = 435;
         player.lives--;
-        player.render();
     }
-    this.render();
-
+   
 };
+
+/*
+ * Resets Enemy's x-axis postion to a random value. 
+ *
+ */
 Enemy.prototype.resetPosition = function () {
-    /*this.x = Math.floor(Math.random() * (20) + 0);
-    this.y = Math.floor(Math.random() * (250) + 5);*/
-    this.x = generateRandomNumber(20,0);
-    this.y = generateRandomNumber(250,5);
+    this.x = generateRandomNumber(this.id*75, this.id*5);
+ 
 };
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function () {
@@ -65,7 +76,6 @@ var Player = function (x, y) {
 };
 
 Player.prototype.update = function () {
-    console.log(this.y);
     if (this.x > 442) {
         this.x = 5;
         this.y = this.y + 5;
@@ -81,8 +91,6 @@ Player.prototype.update = function () {
 
         this.y = 435;
     }
-
-    this.render();
 };
 
 Player.prototype.render = function () {
@@ -119,16 +127,16 @@ Player.prototype.handleInput = function (keyCode) {
         return;
     }
     /*move the player by 15 unit on each key press.
-    Up key will move the player upward on y-axis
-    Down key will move the player downwards
-    Right key will move the player to the right on x-axis
-    Left key will move the player to the left on x-axis
-    */
+     Up key will move the player upward on y-axis
+     Down key will move the player downwards
+     Right key will move the player to the right on x-axis
+     Left key will move the player to the left on x-axis
+     */
     var delta = 15;
     if (keyCode === 'left') {
-        this.x -=  delta;
+        this.x -= delta;
     } else if (keyCode === 'right') {
-        this.x +=  delta;
+        this.x += delta;
     } else if (keyCode === 'down') {
         this.y += this.y;
     } else if (keyCode === 'up') {
@@ -143,11 +151,11 @@ Player.prototype.handleInput = function (keyCode) {
 // Place the player object in a variable called player
 
 var allEnemies = [];
-var enemy1 = new Enemy(1, 1, 65);
+var enemy1 = new Enemy(1);// 1, 75);
 allEnemies[0] = enemy1;
-var enemy2 = new Enemy(2, 5, 100);
+var enemy2 = new Enemy(2);//, 150);// 5, 150);
 allEnemies[1] = enemy2;
-var enemy3 = new Enemy(3, 75, 200);
+var enemy3 = new Enemy(3);//, 75, 225);
 allEnemies[2] = enemy3;
 var player = new Player(225, 435);
 
