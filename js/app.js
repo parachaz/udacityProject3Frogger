@@ -1,5 +1,5 @@
 /*
- * Returnss a random number between p1 and p2
+ * Returns a random number between p1 and p2
  * @param {type} p1
  * @param {type} p2
  * @returns {Number}
@@ -33,48 +33,55 @@ Enemy.prototype.update = function (dt) {
 
     var movement = generateRandomNumber(100, 10);
     this.x += dt * movement;
+
     //Reset enemy's positon if goes too far on the right.
-    
-    if ( this.x > 550 ) {
+    if (this.x > 550) {
         this.resetPosition();
     }
+
     /* Check for collision. if the enemy hit the player
      * deduct a life and reset player's position
      */
-    
+
     if (Math.abs(this.x - player.x) < 16 && Math.abs(this.y - player.y) < 16) {
         player.x = 215;
         player.y = 435;
         player.lives--;
     }
-   
+
 };
 
 /*
- * Resets Enemy's x-axis postion to a random value. 
+ * Resets Enemy's x-axis position to a random value. 
  *
  */
 Enemy.prototype.resetPosition = function () {
-    this.x = generateRandomNumber(this.id*75, this.id*5);
- 
+    this.x = generateRandomNumber(this.id * 75, this.id * 5);
+
 };
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function () {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+/*
+ * Player class represents the player
+ * @param {type} x : Starting X-axis value
+ * @param {type} y : Starting Y-axis value
+ * @returns {Player}
+ */
 
 var Player = function (x, y) {
     this.x = x;
     this.y = y;
     this.sprite = 'images/char-boy.png';
-    this.score = 0;
-    this.lives = 3;
+    this.score = 0; //initialize the score to 0
+    this.lives = 3;//intialize to lives to maximum of 3
 };
 
+/*
+ * Updates Player's position
+ */
 Player.prototype.update = function () {
     if (this.x > 442) {
         this.x = 5;
@@ -83,6 +90,7 @@ Player.prototype.update = function () {
     if (this.x < 0) {
         this.x = 440;
     }
+    //Add 1000 points to the score if the player has reached the water
     if (this.y < 0) {
         this.score = this.score + 1000;
 
@@ -92,7 +100,9 @@ Player.prototype.update = function () {
         this.y = 435;
     }
 };
-
+/*
+ * Renders player on the canvas
+ */
 Player.prototype.render = function () {
     ctx.font = "20px Georgia";
     ctx.clearRect(450, 10, 250, 25);
@@ -106,7 +116,6 @@ Player.prototype.render = function () {
         ctx.drawImage(imageObj, (i) * 45, 0, 50, 50);
     }
 
-    //ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     if (this.lives < 1) {
         this.x = 3 * 101;
@@ -115,6 +124,9 @@ Player.prototype.render = function () {
     }
 
 };
+/*
+ * Stop the game and display Game over message.
+ */
 Player.prototype.die = function () {
     ctx.font = "40px Verdana";
     ctx.fillStyle = '#f00';
@@ -122,6 +134,7 @@ Player.prototype.die = function () {
     ctx.fillText("Game Over!", 150, 295);
     ctx.drawImage(Resources.get('images/grass-block.png'), 3 * 101, 5 * 83);
 };
+
 Player.prototype.handleInput = function (keyCode) {
     if (this.lives < 1) {
         return;
@@ -138,24 +151,21 @@ Player.prototype.handleInput = function (keyCode) {
     } else if (keyCode === 'right') {
         this.x += delta;
     } else if (keyCode === 'down') {
-        this.y += this.y;
+        this.y += delta;
     } else if (keyCode === 'up') {
-        //this.score=this.score+10;
         this.y -= delta;
 
     }
     this.update();
 };
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
 
+//Instantiate enemies and player objects.
 var allEnemies = [];
-var enemy1 = new Enemy(1);// 1, 75);
+var enemy1 = new Enemy(1);
 allEnemies[0] = enemy1;
-var enemy2 = new Enemy(2);//, 150);// 5, 150);
+var enemy2 = new Enemy(2);
 allEnemies[1] = enemy2;
-var enemy3 = new Enemy(3);//, 75, 225);
+var enemy3 = new Enemy(3);
 allEnemies[2] = enemy3;
 var player = new Player(225, 435);
 
