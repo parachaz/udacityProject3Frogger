@@ -15,12 +15,21 @@ var Enemy = function (id) {
     //Give each enemey a radom starting x-axis position 
     this.x = generateRandomNumber(50, 5);
     this.id = id;
-
+    this.row = id;
     //We will use 75 as a multipler to give y-axis spacing among the enemies
     var spacing = id * 75;
 
     //Assign a radom y-axis value to the enemy
     this.y = generateRandomNumber(spacing, spacing - 20);
+    if (id === 1) {
+        this.y = 61;
+
+    }
+    else if (id === 2) {
+        this.y = 145;
+    } else if (id === 3) {
+        this.y = 228;
+    }
     this.sprite = 'images/enemy-bug.png';
 };
 
@@ -39,18 +48,14 @@ Enemy.prototype.update = function (dt) {
         this.resetPosition();
     }
 
-    /* Check for collision. if the enemy hit the player
-     * deduct a life and reset player's position
-     */
-
     if (Math.abs(this.x - player.x) < 16 && Math.abs(this.y - player.y) < 16) {
         player.x = 215;
         player.y = 435;
         player.lives--;
     }
 
-};
 
+};
 /*
  * Resets Enemy's x-axis position to a random value. 
  *
@@ -77,6 +82,7 @@ var Player = function (x, y) {
     this.sprite = 'images/char-boy.png';
     this.score = 0; //initialize the score to 0
     this.lives = 3;//intialize to lives to maximum of 3
+    this.row = 0;
 };
 
 /*
@@ -95,9 +101,9 @@ Player.prototype.update = function () {
         this.score = this.score + 1000;
 
     }
-    if (this.y > 435 || this.y < 0) {
+    if (this.y > 400 || this.y < 0) {
 
-        this.y = 435;
+        this.y = 400;
     }
 };
 /*
@@ -139,35 +145,49 @@ Player.prototype.handleInput = function (keyCode) {
     if (this.lives < 1) {
         return;
     }
-    /*move the player by 15 unit on each key press.
+    /*
+     Reposition the player with each of following key presses.
      Up key will move the player upward on y-axis
      Down key will move the player downwards
      Right key will move the player to the right on x-axis
      Left key will move the player to the left on x-axis
      */
-    var delta = 15;
+    var yDelta = 83; //Player's distance on y-axis with each key press.
+    var xDelta = 101; //Player's distance on x-axis with each key press.
     if (keyCode === 'left') {
-        this.x -= delta;
+        this.x -= xDelta;
+        //if the player moved too far to the left
+        //make is appear on the other side of the game board
+        if (this.x < 3) {
+            this.x = 405;
+        }
     } else if (keyCode === 'right') {
-        this.x += delta;
+        this.x += xDelta;
+        //if the player moved too far to the right
+        //make is appear on the other side of the game board
+        if (this.x > 415) {
+            this.x = 3;
+        }
     } else if (keyCode === 'down') {
-        this.y += delta;
-    } else if (keyCode === 'up') {
-        this.y -= delta;
+        this.y += yDelta;
 
+    } else if (keyCode === 'up') {
+        this.y -= yDelta;
+
+    }
+    if (this.y < 317 && this.y > 68) {
+        this.row = (this.y - 83) % 3;
+    } else if (this.y === 68) {
+        this.row = 3;
+    } else {
+        this.row = 0;
     }
     this.update();
 };
 
 //Instantiate enemies and player objects.
-var allEnemies = [];
-var enemy1 = new Enemy(1);
-allEnemies[0] = enemy1;
-var enemy2 = new Enemy(2);
-allEnemies[1] = enemy2;
-var enemy3 = new Enemy(3);
-allEnemies[2] = enemy3;
-var player = new Player(225, 435);
+var allEnemies = [new Enemy(1), new Enemy(2), new Enemy(3)];
+var player = new Player(205, 400);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
