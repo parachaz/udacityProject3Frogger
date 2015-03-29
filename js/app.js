@@ -12,23 +12,22 @@ var generateRandomNumber = function (p1, p2) {
 
 // Enemies our player must avoid
 var Enemy = function (id) {
-    //Give each enemey a radom starting x-axis position 
+    //Give each enemy a random starting x-axis position 
     this.x = generateRandomNumber(50, 5);
     this.id = id;
     this.row = id;
-    //We will use 75 as a multipler to give y-axis spacing among the enemies
-    var spacing = id * 75;
 
-    //Assign a radom y-axis value to the enemy
-    this.y = generateRandomNumber(spacing, spacing - 20);
-    if (id === 1) {
-        this.y = 61;
+    switch (id) {
+        case 1:
+            this.y = 61;
+            break;
+        case 2:
+            this.y = 145;
+            break;
+        case 3:
+            this.y = 228;
+            break;
 
-    }
-    else if (id === 2) {
-        this.y = 145;
-    } else if (id === 3) {
-        this.y = 228;
     }
     this.sprite = 'images/enemy-bug.png';
 };
@@ -48,13 +47,37 @@ Enemy.prototype.update = function (dt) {
         this.resetPosition();
     }
 
-    if (Math.abs(this.x - player.x) < 16 && Math.abs(this.y - player.y) < 16) {
-        player.x = 215;
-        player.y = 435;
+
+
+    /*if ((this.x === player.x || (enemyRightXPosition > player.x
+     && enemyLeftXPosition < playerLefttXPosition))*/
+    if (this.row === player.row && collidedOnXAxis(this.x)) {
+        player.y = 400;
+        player.x = 205;
+        player.row = 0;
         player.lives--;
     }
+};
 
-
+var collidedOnXAxis = function (enemyXPosition) {
+    var collided = false;
+    var halfWidth = 101 / 2;
+    var enemyRightXPosition = enemyXPosition + halfWidth;
+    var enemyLeftXPosition = enemyXPosition - halfWidth;
+    var playerRightXPosition = player.x + halfWidth;
+    var playerLefttXPosition = player.x - halfWidth;
+    if (enemyXPosition === player.x) {
+        collided = true;
+    }
+    else if (playerRightXPosition > enemyLeftXPosition
+            && playerLefttXPosition < enemyRightXPosition) {
+        console.log(playerRightXPosition + "," + enemyLeftXPosition + "," + playerLefttXPosition + "," + enemyRightXPosition);
+        collided = true;
+    } else if (playerLefttXPosition < enemyRightXPosition &&
+            (playerRightXPosition > enemyRightXPosition)) {
+        collided = true;
+    }
+    return collided;
 };
 /*
  * Resets Enemy's x-axis position to a random value. 
@@ -139,12 +162,10 @@ Player.prototype.die = function () {
 
     ctx.fillText("Game Over!", 150, 295);
     ctx.drawImage(Resources.get('images/grass-block.png'), 3 * 101, 5 * 83);
+
 };
 
 Player.prototype.handleInput = function (keyCode) {
-    if (this.lives < 1) {
-        return;
-    }
     /*
      Reposition the player with each of following key presses.
      Up key will move the player upward on y-axis
@@ -191,13 +212,17 @@ var player = new Player(205, 400);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function (e) {
+document.addEventListener('keyup', function a(e) {
     var allowedKeys = {
         37: 'left',
         38: 'up',
         39: 'right',
         40: 'down'
     };
+    if (player.lives < 1) {
+        document.removeEventListener("keyup", a);
+    } else {
+        player.handleInput(allowedKeys[e.keyCode]);
+    }
 
-    player.handleInput(allowedKeys[e.keyCode]);
 });
